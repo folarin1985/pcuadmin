@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  /* PCU Brand Colors derived from Logo */
+  --color-pcu-purple: #5c1885; /* Deep Royal Purple */
+  --color-pcu-purple-light: #7e2aa8; 
+  --color-pcu-purple-dark: #3b0c58;
+  
+  --color-pcu-red: #da251d; /* Vibrant Red */
+  --color-pcu-red-hover: #b91c15;
+
+  /* Glossy/Glass Effects */
+  --backdrop-blur-md: 12px;
+}
+
+/* Custom Global Styles for Glossy Look */
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .glass-sidebar {
+    @apply bg-pcu-purple/95 backdrop-blur-xl border-r border-white/10;
+  }
+
+  .glossy-card {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pcu-purple/20 focus:border-pcu-purple outline-none transition-all duration-200;
+  }
+
+    /* Custom Sidebar Scrollbar */
+  .custom-sidebar-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  .custom-sidebar-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-sidebar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+  }
+
+  .custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+body {
+  @apply bg-gray-50 text-gray-800 font-sans antialiased;
+}
+
