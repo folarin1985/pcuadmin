@@ -90,7 +90,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     },
     { 
       path: '/admin/widgets', 
-      name: 'Homepage Widgets', 
+      name: 'Homepage Widget', 
       icon: IoShapesOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
