@@ -214,7 +214,9 @@ const Sliders = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
-                <input type="text" className="input-field" placeholder="e.g. Your Journey Begins Here" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+                {/*<input type="text" className="input-field" placeholder="e.g. Your Journey Begins Here" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />*/}
+
+                <textarea className="input-field min-h-[60px]" placeholder="Your Journey Begins Here" value={formData.subtitle} onChange={e => setFormData({...formData, title: e.target.value})} />
               </div>
               
               <div>
