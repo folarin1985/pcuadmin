@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
 import { toast } from 'react-hot-toast';
@@ -10,7 +10,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import Spinner from '../../components/common/Spinner';
 import { glossyTableStyles } from '../../styles/tableStyles';
 
 const Sliders = () => {
@@ -32,7 +31,8 @@ const Sliders = () => {
     title: '', 
     subtitle: '', 
     media_type: 'image', // 'image' or 'video'
-    media_path: '', 
+    media_path: '', // Stores the Preview URL (Remote or Local Blob)
+    file: null,     // Stores the actual File Object for upload
     cta_text: '', 
     cta_link: '', 
     order: 0,
@@ -67,9 +67,12 @@ const Sliders = () => {
           return toast.error("Please select a valid image file");
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => setFormData(prev => ({ ...prev, media_path: reader.result }));
-      reader.readAsDataURL(file);
+      // Use URL.createObjectURL for instant preview (better performance than FileReader)
+      setFormData(prev => ({ 
+          ...prev, 
+          file: file, 
+          media_path: URL.createObjectURL(file) 
+      }));
     }
   };
 
@@ -85,7 +88,8 @@ const Sliders = () => {
       title: slider.title,
       subtitle: slider.subtitle || '',
       media_type: slider.media_type,
-      media_path: slider.media_path || '',
+      media_path: getImageUrl(slider.media_path), // Use helper to get full URL for preview
+      file: null, // Reset file input
       cta_text: slider.cta_text || '',
       cta_link: slider.cta_link || '',
       order: slider.order || 0,
@@ -97,21 +101,47 @@ const Sliders = () => {
   // --- CRUD ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.media_path) return toast.error("Please upload media");
+    
+    // Validation: Require file only on Create
+    if (!selectedSlider && !formData.file) return toast.error("Please upload media");
 
     setIsSubmitting(true);
+
+    // Construct FormData object
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('subtitle', formData.subtitle || '');
+    data.append('media_type', formData.media_type);
+    data.append('cta_text', formData.cta_text || '');
+    data.append('cta_link', formData.cta_link || '');
+    data.append('order', formData.order);
+    data.append('is_active', formData.is_active ? '1' : '0');
+
+    // Only append file if user selected a new one
+    if (formData.file) {
+        data.append('media_path', formData.file);
+    }
+
     try {
       if (selectedSlider) {
-        await axios.put(`/sliders/${selectedSlider.id}`, formData);
+        // FIX: Laravel Method Spoofing for PUT requests with Files
+        data.append('_method', 'PUT'); 
+        
+        await axios.post(`/sliders/${selectedSlider.id}`, data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         toast.success('Slider updated');
       } else {
-        await axios.post('/sliders', formData);
+        await axios.post('/sliders', data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         toast.success('Slider created');
       }
       setIsFormOpen(false);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Operation failed');
+      console.error(error);
+      toast.error(error.response?.data?.message || 'Operation failed. Check file size.');
     } finally {
       setIsSubmitting(false);
     }
@@ -135,7 +165,7 @@ const Sliders = () => {
       cell: row => (
         <div className="w-20 h-12 rounded-lg bg-gray-100 overflow-hidden border border-gray-200 flex items-center justify-center relative">
            {row.media_type === 'image' ? (
-             <img src={getImageUrl(row.media_path)} className="w-full h-full object-cover" />
+             <img src={getImageUrl(row.media_path)} className="w-full h-full object-cover" alt="slide" />
            ) : (
              <>
                 <video src={getImageUrl(row.media_path)} className="w-full h-full object-cover opacity-80" muted />
@@ -214,9 +244,7 @@ const Sliders = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
-                {/*<input type="text" className="input-field" placeholder="e.g. Your Journey Begins Here" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />*/}
-
-                <textarea className="input-field min-h-[60px]" placeholder="Your Journey Begins Here" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                <textarea className="input-field min-h-[60px]" placeholder="Your Journey Begins Here" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
               </div>
               
               <div>
@@ -253,9 +281,9 @@ const Sliders = () => {
                     <div className="relative w-full h-40 bg-white rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center overflow-hidden hover:border-pcu-purple transition-colors group">
                         {formData.media_path ? (
                             formData.media_type === 'image' ? (
-                                <img src={getImageUrl(formData.media_path)} className="w-full h-full object-cover" />
+                                <img src={formData.media_path} className="w-full h-full object-cover" alt="preview" />
                             ) : (
-                                <video src={getImageUrl(formData.media_path)} className="w-full h-full object-cover" muted autoPlay loop />
+                                <video src={formData.media_path} className="w-full h-full object-cover" muted autoPlay loop />
                             )
                         ) : (
                             <div className="text-center text-gray-400">
