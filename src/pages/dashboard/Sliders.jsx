@@ -121,7 +121,7 @@ const Sliders = () => {
     if (formData.file) {
         data.append('media_path', formData.file);
     }
-
+ 
     try {
       if (selectedSlider) {
         // FIX: Laravel Method Spoofing for PUT requests with Files
@@ -327,4 +327,4 @@ const Sliders = () => {
   );
 };
 
-export default Sliders;
+export default Sliders;  
