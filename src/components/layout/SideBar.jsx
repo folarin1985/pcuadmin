@@ -207,7 +207,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <div className="w-16 h-16 bg-white rounded-full p-2 mb-3 shadow-lg flex items-center justify-center">
             <img src={Logo} alt="PCU Logo" className="w-full h-full object-contain" />
           </div>
-          <h2 className="text-lg font-bold tracking-wide">PCU ADMIN</h2>
+          <h2 className="text-lg font-bold tracking-wide">Precious Cornerstone University</h2>
           
           {/* VISUAL DEBUG: Shows what the code "thinks" the role is */}
           <div className="mt-2 text-center">
