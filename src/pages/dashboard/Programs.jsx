@@ -3,21 +3,18 @@ import axios from 'axios';
 import DataTable from 'react-data-table-component';
 import { toast } from 'react-hot-toast';
 import { 
-  IoAdd, IoPencil, IoTrash, IoSchoolOutline, IoImageOutline, 
-  IoStarOutline, IoStar, IoArrowUndo, IoBookOutline, IoRibbonOutline, IoLayersOutline
+  IoAdd, IoPencil, IoTrash, IoStarOutline, IoStar, 
+  IoArrowUndo, IoBookOutline, IoRibbonOutline, IoLayersOutline
 } from 'react-icons/io5';
-import { useAuth } from '../../contexts/AuthContext';
 
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import { glossyTableStyles } from '../../styles/tableStyles';
 
+const DEFAULT_BOOK_IMAGE = "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop";
+
 const Programs = () => {
-  // We don't rely entirely on useAuth's getImageUrl here, we build a local robust one
-  // just in case the context one isn't fully formatted for admin nested routes.
-  const { getImageUrl: contextGetImageUrl } = useAuth();
-  
   // --- States ---
   const [activeTab, setActiveTab] = useState('programs'); 
 
@@ -57,7 +54,6 @@ const Programs = () => {
   const [degreeForm, setDegreeForm] = useState({ name: '', abbr: '', program_category_id: '' });
   const [categoryForm, setCategoryForm] = useState({ name: '' });
 
-  // FIXED: Local robust Image Helper
   const getLocalImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http') || path.startsWith('data:')) return path;
@@ -446,14 +442,18 @@ const Programs = () => {
                <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Course Page Banner</label>
                 <div className="relative w-full h-32 bg-gray-200 rounded-xl overflow-hidden border border-gray-200 group">
-                   {programForm.banner_image ? (
-                     // USING THE FIXED LOCAL URL GENERATOR
-                     <img src={getLocalImageUrl(programForm.banner_image)} className="w-full h-full object-cover" alt="Banner Preview" />
-                   ) : (
-                     <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                        <IoImageOutline size={24} />
-                     </div>
-                   )}
+                   
+                   {/* FALLBACK IMAGE LOGIC ADDED HERE */}
+                   <img 
+                     src={programForm.banner_image ? getLocalImageUrl(programForm.banner_image) : DEFAULT_BOOK_IMAGE} 
+                     className="w-full h-full object-cover" 
+                     alt="Banner Preview" 
+                     onError={(e) => { 
+                         e.target.onerror = null; 
+                         e.target.src = DEFAULT_BOOK_IMAGE; 
+                     }}
+                   />
+                   
                    <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                       <span className="text-white font-medium text-sm">Upload</span>
                       <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
