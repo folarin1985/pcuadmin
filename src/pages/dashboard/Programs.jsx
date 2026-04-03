@@ -14,10 +14,12 @@ import ConfirmModal from '../../components/common/ConfirmModal';
 import { glossyTableStyles } from '../../styles/tableStyles';
 
 const Programs = () => {
-  const { getImageUrl } = useAuth();
+  // We don't rely entirely on useAuth's getImageUrl here, we build a local robust one
+  // just in case the context one isn't fully formatted for admin nested routes.
+  const { getImageUrl: contextGetImageUrl } = useAuth();
   
   // --- States ---
-  const [activeTab, setActiveTab] = useState('programs'); // 'programs', 'degrees', 'categories'
+  const [activeTab, setActiveTab] = useState('programs'); 
 
   // Data
   const [programs, setPrograms] = useState([]);
@@ -55,8 +57,21 @@ const Programs = () => {
   const [degreeForm, setDegreeForm] = useState({ name: '', abbr: '', program_category_id: '' });
   const [categoryForm, setCategoryForm] = useState({ name: '' });
 
+  // FIXED: Local robust Image Helper
+  const getLocalImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+
+    // Grab the base URL directly from axios (which is configured to your backend)
+    const baseUrl = (axios.defaults.baseURL || '').replace(/\/api\/?$/, '');
+
+    let cleanPath = path.replace(/^public\//, '').replace(/^storage\//, '').replace(/^\/storage\//, '');
+    if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
+
+    return `${baseUrl}/storage${cleanPath}`;
+  };
+
   // --- Fetch Data ---
-  // Fetch all necessary data from the backend APIs concurrently
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -79,7 +94,6 @@ const Programs = () => {
     }
   };
 
-  // Fetch deleted programs for the recycle bin functionality
   const fetchTrash = async () => {
     try {
       const res = await axios.get('/admin/programs/trash');
@@ -91,10 +105,8 @@ const Programs = () => {
 
   useEffect(() => { fetchData(); }, []);
 
-  // --- Handlers ---
   const handleSearch = (e) => setSearch(e.target.value);
 
-  // Converts uploaded image files to base64 strings for preview and payload submission
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -104,7 +116,6 @@ const Programs = () => {
     }
   };
 
-  // --- CRUD: Program ---
   const openCreateModal = () => {
     setSelectedItem(null);
     const defaultDegree = degreeTypes.length > 0 ? degreeTypes[0].id : '';
@@ -115,10 +126,7 @@ const Programs = () => {
   const openEditModal = (program) => {
     setSelectedItem(program);
     
-    // FIX 1: Use loose equality (==) to handle cases where id is an int but department_id is a string
     const dept = departments.find(d => d.id == program.department_id);
-    
-    // FIX 2: Added a fallback. If dept is not found in the list, check if the nested department object has the faculty_id
     const facultyId = dept ? dept.faculty_id : (program.department?.faculty_id || '');
 
     setProgramForm({ 
@@ -142,7 +150,6 @@ const Programs = () => {
     setIsSubmitting(true);
     try {
       const payload = { ...programForm };
-      // Prevent resending the existing URL string back as base64 to the server
       if (payload.banner_image && !payload.banner_image.startsWith('data:')) delete payload.banner_image; 
 
       if (selectedItem) {
@@ -158,7 +165,6 @@ const Programs = () => {
     finally { setIsSubmitting(false); }
   };
 
-  // --- CRUD: Degree ---
   const openDegreeModal = (degree = null) => {
       setSelectedItem(degree);
       const defaultCat = categories.length > 0 ? categories[0].id : '';
@@ -186,7 +192,6 @@ const Programs = () => {
       finally { setIsSubmitting(false); }
   };
 
-  // --- CRUD: Category ---
   const openCategoryModal = (cat = null) => {
       setSelectedItem(cat);
       setCategoryForm(cat ? { name: cat.name } : { name: '' });
@@ -210,11 +215,9 @@ const Programs = () => {
       finally { setIsSubmitting(false); }
   };
 
-  // --- Delete ---
   const handleDelete = async () => {
     setIsSubmitting(true);
     try {
-      // Handle the correct deletion endpoint based on the type flag stored in state
       if (deleteTarget.type === 'program') {
           await axios.delete(`/programs/${deleteTarget.id}`);
           toast.success('Moved to Recycle Bin');
@@ -231,10 +234,8 @@ const Programs = () => {
     finally { setIsSubmitting(false); }
   };
 
-  // --- Trash ---
   const openTrashModal = () => { fetchTrash(); setIsTrashOpen(true); };
   
-  // Restore a deleted program from the trash
   const handleRestore = async (id) => {
     setRestoringId(id);
     try {
@@ -245,14 +246,11 @@ const Programs = () => {
     finally { setRestoringId(null); }
   };
 
-  // --- Filters ---
   const filteredDepartments = useMemo(() => {
     if (!programForm.faculty_id) return [];
-    // FIX 3: Replaced strict === parseInt() with loose == to prevent type mismatch errors returning empty arrays
     return departments.filter(d => d.faculty_id == programForm.faculty_id);
   }, [departments, programForm.faculty_id]);
 
-  // Search by Title, Category Name, or Department dynamically
   const filteredPrograms = useMemo(() => {
       const s = search.toLowerCase();
       return programs.filter(p => 
@@ -265,7 +263,6 @@ const Programs = () => {
   const filteredDegrees = useMemo(() => degreeTypes.filter(d => d.name.toLowerCase().includes(search.toLowerCase())), [degreeTypes, search]);
   const filteredCategories = useMemo(() => categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase())), [categories, search]);
 
-  // --- Columns ---
   const programColumns = [
   {
     name: 'Program',
@@ -330,7 +327,6 @@ const Programs = () => {
       }
   ];
 
-  // Helper logic to dynamically open correct modal based on active tab
   const handleAddClick = () => {
       if (activeTab === 'programs') openCreateModal();
       else if (activeTab === 'degrees') openDegreeModal();
@@ -451,7 +447,8 @@ const Programs = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Course Page Banner</label>
                 <div className="relative w-full h-32 bg-gray-200 rounded-xl overflow-hidden border border-gray-200 group">
                    {programForm.banner_image ? (
-                     <img src={getImageUrl(programForm.banner_image)} className="w-full h-full object-cover" alt="Banner Preview" />
+                     // USING THE FIXED LOCAL URL GENERATOR
+                     <img src={getLocalImageUrl(programForm.banner_image)} className="w-full h-full object-cover" alt="Banner Preview" />
                    ) : (
                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
                         <IoImageOutline size={24} />
