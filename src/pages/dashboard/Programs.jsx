@@ -56,6 +56,7 @@ const Programs = () => {
   const [categoryForm, setCategoryForm] = useState({ name: '' });
 
   // --- Fetch Data ---
+  // Fetch all necessary data from the backend APIs concurrently
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -78,6 +79,7 @@ const Programs = () => {
     }
   };
 
+  // Fetch deleted programs for the recycle bin functionality
   const fetchTrash = async () => {
     try {
       const res = await axios.get('/admin/programs/trash');
@@ -92,6 +94,7 @@ const Programs = () => {
   // --- Handlers ---
   const handleSearch = (e) => setSearch(e.target.value);
 
+  // Converts uploaded image files to base64 strings for preview and payload submission
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -111,15 +114,20 @@ const Programs = () => {
 
   const openEditModal = (program) => {
     setSelectedItem(program);
-    const dept = departments.find(d => d.id === program.department_id);
-    const facultyId = dept ? dept.faculty_id : '';
+    
+    // FIX 1: Use loose equality (==) to handle cases where id is an int but department_id is a string
+    const dept = departments.find(d => d.id == program.department_id);
+    
+    // FIX 2: Added a fallback. If dept is not found in the list, check if the nested department object has the faculty_id
+    const facultyId = dept ? dept.faculty_id : (program.department?.faculty_id || '');
+
     setProgramForm({ 
-      title: program.title,
-      degree_type_id: program.degree_type_id,
-      duration: program.duration,
+      title: program.title || '',
+      degree_type_id: program.degree_type_id || '',
+      duration: program.duration || '',
       overview: program.overview || '',
       requirements: program.requirements || '',
-      department_id: program.department_id,
+      department_id: program.department_id || '',
       faculty_id: facultyId,
       banner_image: program.banner_image || '',
       banner_caption: program.banner_caption || '',
@@ -134,6 +142,7 @@ const Programs = () => {
     setIsSubmitting(true);
     try {
       const payload = { ...programForm };
+      // Prevent resending the existing URL string back as base64 to the server
       if (payload.banner_image && !payload.banner_image.startsWith('data:')) delete payload.banner_image; 
 
       if (selectedItem) {
@@ -205,6 +214,7 @@ const Programs = () => {
   const handleDelete = async () => {
     setIsSubmitting(true);
     try {
+      // Handle the correct deletion endpoint based on the type flag stored in state
       if (deleteTarget.type === 'program') {
           await axios.delete(`/programs/${deleteTarget.id}`);
           toast.success('Moved to Recycle Bin');
@@ -223,6 +233,8 @@ const Programs = () => {
 
   // --- Trash ---
   const openTrashModal = () => { fetchTrash(); setIsTrashOpen(true); };
+  
+  // Restore a deleted program from the trash
   const handleRestore = async (id) => {
     setRestoringId(id);
     try {
@@ -236,10 +248,11 @@ const Programs = () => {
   // --- Filters ---
   const filteredDepartments = useMemo(() => {
     if (!programForm.faculty_id) return [];
-    return departments.filter(d => d.faculty_id === parseInt(programForm.faculty_id));
+    // FIX 3: Replaced strict === parseInt() with loose == to prevent type mismatch errors returning empty arrays
+    return departments.filter(d => d.faculty_id == programForm.faculty_id);
   }, [departments, programForm.faculty_id]);
 
-  // UPDATED SEARCH LOGIC: Search by Title, Category Name, or Department
+  // Search by Title, Category Name, or Department dynamically
   const filteredPrograms = useMemo(() => {
       const s = search.toLowerCase();
       return programs.filter(p => 
@@ -261,9 +274,7 @@ const Programs = () => {
     cell: row => (
       <div className="py-2">
         <div className="flex items-center gap-2">
-          {/* FIX: Add '!!' before row.is_featured to force a boolean check */}
           {!!row.is_featured && <IoStar className="text-amber-400 text-sm" />}
-          
           <p className="font-semibold text-gray-700">{row.title}</p>
         </div>
         <div className="flex items-center gap-2 mt-1">
@@ -319,6 +330,7 @@ const Programs = () => {
       }
   ];
 
+  // Helper logic to dynamically open correct modal based on active tab
   const handleAddClick = () => {
       if (activeTab === 'programs') openCreateModal();
       else if (activeTab === 'degrees') openDegreeModal();
@@ -409,7 +421,7 @@ const Programs = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Faculty</label>
-                <select className="input-field" value={programForm.faculty_id} onChange={e => setProgramForm({...programForm, faculty_id: e.target.value, department_id: ''})}>
+                <select className="input-field" value={programForm.faculty_id || ''} onChange={e => setProgramForm({...programForm, faculty_id: e.target.value, department_id: ''})}>
                   <option value="">Select Faculty...</option>
                   {faculties.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
                 </select>
@@ -417,7 +429,7 @@ const Programs = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                <select className="input-field" value={programForm.department_id} onChange={e => setProgramForm({...programForm, department_id: e.target.value})} disabled={!programForm.faculty_id}>
+                <select className="input-field" value={programForm.department_id || ''} onChange={e => setProgramForm({...programForm, department_id: e.target.value})} disabled={!programForm.faculty_id}>
                   <option value="">{programForm.faculty_id ? 'Select Department...' : 'Select Faculty first'}</option>
                   {filteredDepartments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
@@ -425,8 +437,6 @@ const Programs = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                {/*<input type="text" className="input-field" value={programForm.duration} onChange={e => setProgramForm({...programForm, duration: e.target.value})} placeholder="e.g. 4 Years" />*/}
-
                 <textarea className="input-field min-h-[100px]" value={programForm.duration} onChange={e => setProgramForm({...programForm, duration: e.target.value})} placeholder="e.g. 4 Years" />
               </div>
             </div>
@@ -441,7 +451,7 @@ const Programs = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Course Page Banner</label>
                 <div className="relative w-full h-32 bg-gray-200 rounded-xl overflow-hidden border border-gray-200 group">
                    {programForm.banner_image ? (
-                     <img src={getImageUrl(programForm.banner_image)} className="w-full h-full object-cover" />
+                     <img src={getImageUrl(programForm.banner_image)} className="w-full h-full object-cover" alt="Banner Preview" />
                    ) : (
                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
                         <IoImageOutline size={24} />
@@ -497,10 +507,9 @@ const Programs = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Abbreviation (Tab Label)</label>
                 <input type="text" className="input-field" required value={degreeForm.abbr} onChange={e => setDegreeForm({...degreeForm, abbr: e.target.value})} placeholder="e.g. B.Sc" />
             </div>
-            {/* New Category Link */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Program Category</label>
-                <select className="input-field" required value={degreeForm.program_category_id} onChange={e => setDegreeForm({...degreeForm, program_category_id: e.target.value})}>
+                <select className="input-field" required value={degreeForm.program_category_id || ''} onChange={e => setDegreeForm({...degreeForm, program_category_id: e.target.value})}>
                     <option value="">Select Category...</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
