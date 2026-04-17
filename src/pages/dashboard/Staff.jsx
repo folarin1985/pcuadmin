@@ -361,6 +361,7 @@ const Staff = () => {
                     <option value="Mrs.">Mrs.</option>
                     <option value="Ms.">Ms.</option>
                     <option value="Engr.">Engr.</option>
+                    <option value="Pastor">Pastor</option>
                     <option value="Rev.">Rev.</option>
                     <option value="Very Rev.">Very Rev.</option>
                   </select>
