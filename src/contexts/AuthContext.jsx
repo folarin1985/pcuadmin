@@ -80,8 +80,12 @@ export const AuthProvider = ({ children }) => {
     if (path.startsWith('http')) return path; 
     if (path.startsWith('data:')) return path; 
     
-    const baseUrl = axios.defaults.baseURL.replace('/api', '');
-    return `${baseUrl}${path}`;
+    // Clean base URL and path to ensure exact formatting: http://domain.com/storage/path.jpg
+    const baseUrl = (axios.defaults.baseURL || '').replace(/\/api\/?$/, '');
+    let cleanPath = path.replace(/^public\//, '').replace(/^storage\//, '').replace(/^\/storage\//, '');
+    if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
+    
+    return `${baseUrl}/storage${cleanPath}`;
   };
 
   return (

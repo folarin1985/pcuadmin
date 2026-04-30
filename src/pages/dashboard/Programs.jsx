@@ -28,6 +28,8 @@ const Programs = () => {
   
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  const [studyMode, setStudyMode] = useState('All');
   
   // Modals
   const [isProgramModalOpen, setIsProgramModalOpen] = useState(false);
@@ -255,12 +257,18 @@ const Programs = () => {
 
   const filteredPrograms = useMemo(() => {
       const s = search.toLowerCase();
-      return programs.filter(p => 
-          p.title.toLowerCase().includes(s) || 
-          p.degree_type?.category?.name?.toLowerCase().includes(s) || 
-          p.department?.name?.toLowerCase().includes(s)
-      );
-  }, [programs, search]);
+      return programs.filter(p => {
+          const matchesSearch = p.title.toLowerCase().includes(s) || 
+                                p.degree_type?.category?.name?.toLowerCase().includes(s) || 
+                                p.department?.name?.toLowerCase().includes(s);
+          
+          // Filter by Study Mode
+          const matchesMode = studyMode === 'All' ? true : 
+                              (studyMode === 'Full-Time' ? p.is_full_time : p.is_part_time);
+                              
+          return matchesSearch && matchesMode;
+      });
+  }, [programs, search, studyMode]);
 
   const filteredDegrees = useMemo(() => degreeTypes.filter(d => d.name.toLowerCase().includes(search.toLowerCase())), [degreeTypes, search]);
   const filteredCategories = useMemo(() => categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase())), [categories, search]);
@@ -379,12 +387,22 @@ const Programs = () => {
             </button>
         </div>
 
-        <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-end">
+        <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row justify-end gap-3">
+          {activeTab === 'programs' && (
+              <select 
+                  className="input-field py-2 w-full md:w-48 bg-white text-sm" 
+                  value={studyMode} 
+                  onChange={e => setStudyMode(e.target.value)}
+              >
+                  <option value="All">All Study Modes</option>
+                  <option value="Full-Time">Full-Time Only</option>
+                  <option value="Part-Time">Part-Time Only</option>
+              </select>
+          )}
           <div className="w-full md:w-64">
-            <input type="text" placeholder={`Search ${activeTab}...`} className="input-field py-2" value={search} onChange={handleSearch} />
+            <input type="text" placeholder={`Search ${activeTab}...`} className="input-field py-2 text-sm" value={search} onChange={handleSearch} />
           </div>
         </div>
-
         <DataTable 
             columns={activeTab === 'programs' ? programColumns : (activeTab === 'degrees' ? degreeColumns : categoryColumns)} 
             data={activeTab === 'programs' ? filteredPrograms : (activeTab === 'degrees' ? filteredDegrees : filteredCategories)} 
