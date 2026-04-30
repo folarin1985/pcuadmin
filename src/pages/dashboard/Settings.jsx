@@ -263,8 +263,6 @@ const Settings = () => {
                 </div>
             )}
 
-
-            // Add this below the social tab rendering inside Settings.jsx:
             {/* --- TAB 4: LEADERSHIP (Chaplain & CED) --- */}
             {activeTab === 'leadership' && (
                 <div className="space-y-8 max-w-4xl">
