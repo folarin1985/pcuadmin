@@ -130,6 +130,7 @@ const Settings = () => {
                 { id: 'general', label: 'Branding & SEO', icon: IoImagesOutline },
                 { id: 'contact', label: 'Contact Info', icon: IoCallOutline },
                 { id: 'social', label: 'Social Media', icon: IoShareSocialOutline },
+                { id: 'leadership', label: 'Chaplain & CED', icon: IoPeopleOutline },
                 //{ id: 'alert', label: 'Top Bar Alert', icon: IoMegaphoneOutline },
             ].map(tab => (
                 <button
@@ -258,6 +259,55 @@ const Settings = () => {
                         <input type="text" name="social_linkedin" className="input-field" value={settings.social_linkedin} onChange={handleSettingChange} />
                     </div>
                     <Button onClick={saveSettings} isLoading={isSubmitting}><IoSaveOutline className="mr-2"/> Save Social Links</Button>
+                </div>
+            )}
+
+
+            // Add this below the social tab rendering inside Settings.jsx:
+            {/* --- TAB 4: LEADERSHIP (Chaplain & CED) --- */}
+            {activeTab === 'leadership' && (
+                <div className="space-y-8 max-w-4xl">
+                    {/* Chaplain Details */}
+                    <div className="bg-purple-50 p-6 rounded-2xl border border-purple-100">
+                        <h3 className="text-lg font-bold text-pcu-purple mb-4">University Chaplaincy</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Chaplain Name</label>
+                                <input type="text" name="chaplain_name" className="input-field bg-white" placeholder="e.g. Pastor John Doe" value={settings.chaplain_name || ''} onChange={handleSettingChange} />
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-white overflow-hidden border-2 border-white shadow-sm shrink-0">
+                                    {settings.chaplain_image ? <img src={getImageUrl(settings.chaplain_image)} className="w-full h-full object-cover"/> : <span className="flex h-full items-center justify-center text-xs text-gray-400">Photo</span>}
+                                </div>
+                                <label className="cursor-pointer text-sm font-bold text-pcu-purple hover:underline bg-white px-3 py-1.5 rounded-lg border border-purple-200">
+                                    Upload Photo
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'chaplain_image')} />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CED Director Details */}
+                    <div className="bg-yellow-50 p-6 rounded-2xl border border-yellow-100">
+                        <h3 className="text-lg font-bold text-yellow-800 mb-4">Centre for Entrepreneurship (CED)</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Director Name</label>
+                                <input type="text" name="ced_director_name" className="input-field bg-white" placeholder="e.g. Dr. Jane Smith" value={settings.ced_director_name || ''} onChange={handleSettingChange} />
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-white overflow-hidden border-2 border-white shadow-sm shrink-0">
+                                    {settings.ced_director_image ? <img src={getImageUrl(settings.ced_director_image)} className="w-full h-full object-cover"/> : <span className="flex h-full items-center justify-center text-xs text-gray-400">Photo</span>}
+                                </div>
+                                <label className="cursor-pointer text-sm font-bold text-yellow-700 hover:underline bg-white px-3 py-1.5 rounded-lg border border-yellow-200">
+                                    Upload Photo
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'ced_director_image')} />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button onClick={saveSettings} isLoading={isSubmitting}><IoSaveOutline className="mr-2"/> Save Details</Button>
                 </div>
             )}
 

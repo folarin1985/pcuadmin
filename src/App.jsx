@@ -28,6 +28,8 @@ import Admissions from './pages/dashboard/Admissions';
 import AcademicCalendar from './pages/dashboard/AcademicCalendar';
 import TuitionManagement from './pages/dashboard/TuitionManagement';
 import Trustees from './pages/dashboard/Trustees';
+import GoverningCouncil from './pages/dashboard/GoverningCouncil';
+import CedManager from './pages/dashboard/CedManager';
 import JupebManager from './pages/dashboard/JupebManager';
 import Scholarships from './pages/dashboard/Scholarships';
 
@@ -71,6 +73,7 @@ const App = () => {
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="bot" element={<Trustees />} />
+                <Route path="governing-council" element={<GoverningCouncil />} />
                 <Route path="menus" element={<Menus />} />
             </Route>
 
@@ -81,6 +84,7 @@ const App = () => {
                 <Route path="sliders" element={<Sliders />} />
                 <Route path="widgets" element={<HomepageWidgets />} />
                 <Route path="categories" element={<CategoryPage />} />
+                <Route path="ced-manager" element={<CedManager />} />
             </Route>
 
             {/* 4. EVENT MANAGEMENT (Super Admin, Editor, Event Manager) */}

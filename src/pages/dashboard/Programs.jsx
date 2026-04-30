@@ -48,8 +48,11 @@ const Programs = () => {
     overview: '', requirements: '', 
     faculty_id: '', department_id: '',
     banner_image: '', banner_caption: '',
-    is_featured: false
+    is_featured: false,
+    is_part_time: false
   };
+
+
   const [programForm, setProgramForm] = useState(initialProgramForm);
   const [degreeForm, setDegreeForm] = useState({ name: '', abbr: '', program_category_id: '' });
   const [categoryForm, setCategoryForm] = useState({ name: '' });
@@ -135,7 +138,8 @@ const Programs = () => {
       faculty_id: facultyId,
       banner_image: program.banner_image || '',
       banner_caption: program.banner_caption || '',
-      is_featured: Boolean(program.is_featured)
+      is_featured: Boolean(program.is_featured),
+      is_part_time: Boolean(program.is_part_time)
     });
     setIsProgramModalOpen(true);
   };
@@ -276,6 +280,10 @@ const Programs = () => {
             </span>
             <span className="text-xs text-gray-400">•</span>
             <span className="text-xs font-bold text-gray-500">{row.degree_type?.abbr || 'N/A'}</span>
+            {/* New Part-Time Badge */}
+            {row.is_part_time && (
+               <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded ml-2">Part-Time</span>
+            )}
         </div>
       </div>
     ),
@@ -471,6 +479,17 @@ const Programs = () => {
                  >
                    {programForm.is_featured ? <IoStar /> : <IoStarOutline />}
                    {programForm.is_featured ? 'Featured on Homepage' : 'Standard Course'}
+                 </button>
+
+                 {/* New Part-Time Toggle */}
+                 <button 
+                   type="button"
+                   onClick={() => setProgramForm(prev => ({...prev, is_part_time: !prev.is_part_time}))}
+                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
+                     programForm.is_part_time ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-600'
+                   }`}
+                 >
+                   {programForm.is_part_time ? 'Part-Time Program' : 'Full-Time Program'}
                  </button>
               </div>
             </div>

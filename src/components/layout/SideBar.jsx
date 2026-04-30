@@ -82,6 +82,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: IoShieldOutline, 
       roles: ['Super Admin'] 
     },
+    { path: '/admin/governing-council', 
+      name: 'Governing Council', 
+      icon: IoShieldCheckmarkOutline, 
+      roles: ['Super Admin'] 
+    },
+    { 
+      path: '/admin/ced-manager', 
+      name: 'CED Manager', 
+      icon: IoShieldCheckmarkOutline, 
+      roles: ['Super Admin'] 
+    },
     { 
       path: '/admin/sliders', 
       name: 'Homepage Banners', 

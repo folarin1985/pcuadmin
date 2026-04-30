@@ -30,7 +30,8 @@ const Faculties = () => {
     color_code: '#5c1885', // Default PCU Purple
     image_path: '', // Thumbnail
     banner_image: '', // Hero Banner
-    banner_caption: '' 
+    banner_caption: '',
+    dean_name: ''
   };
   const [formData, setFormData] = useState(initialForm);
 
@@ -78,7 +79,8 @@ const Faculties = () => {
       color_code: faculty.color_code || '#5c1885',
       image_path: faculty.image_path || '',
       banner_image: faculty.banner_image || '',
-      banner_caption: faculty.banner_caption || ''
+      banner_caption: faculty.banner_caption || '',
+      dean_name: faculty.dean_name || ''
     });
     setIsFormOpen(true);
   };
@@ -159,6 +161,14 @@ const Faculties = () => {
         </span>
       )
     },
+
+    {
+      name: 'Dean',
+      selector: row => row.dean_name,
+      sortable: true,
+      cell: row => <span className="text-sm text-gray-600 font-medium">{row.dean_name || 'Not Assigned'}</span>
+    },
+    
     {
       name: 'Actions',
       cell: row => (
@@ -195,6 +205,11 @@ const Faculties = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Faculty Name</label>
                 <input type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dean's Name</label>
+                <input type="text" className="input-field" placeholder="e.g. Prof. John Doe" value={formData.dean_name} onChange={e => setFormData({...formData, dean_name: e.target.value})} />
               </div>
               
               <div>
