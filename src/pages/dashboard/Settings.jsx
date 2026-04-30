@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { 
-  IoSaveOutline, IoImagesOutline, IoCallOutline, IoShareSocialOutline, IoMegaphoneOutline, IoCloudUploadOutline
+  IoSaveOutline, IoImagesOutline, IoCallOutline, IoShareSocialOutline, IoMegaphoneOutline, 
+  IoCloudUploadOutline, IoPeopleOutline,
 } from 'react-icons/io5';
 import { useAuth } from '../../contexts/AuthContext';
 
