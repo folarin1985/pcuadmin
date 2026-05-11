@@ -94,6 +94,8 @@ const Settings = () => {
       await axios.post('/settings', settings);
       toast.success('Site settings updated');
     } catch (error) {
+      // THIS WILL PRINT THE EXACT SERVER ERROR TO YOUR BROWSER CONSOLE
+      console.error("FULL ERROR RESPONSE:", error.response?.data || error.message);
       toast.error('Failed to save settings');
     } finally {
       setIsSubmitting(false);
@@ -111,6 +113,8 @@ const Settings = () => {
         }
         toast.success('Alert banner updated');
     } catch (error) {
+        // THIS WILL PRINT THE EXACT SERVER ERROR TO YOUR BROWSER CONSOLE
+        console.error("FULL ERROR RESPONSE:", error.response?.data || error.message);
         toast.error('Failed to update alert');
     } finally {
         setIsSubmitting(false);
