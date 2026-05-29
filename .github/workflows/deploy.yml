@@ -19,8 +19,12 @@ jobs:
         cache: 'npm'
 
     - name: Install Dependencies & Build
+      env:
+        VITE_API_BASE_URL: "http://72.61.138.82/api"
+        VITE_API_BASE_URL_FOR_FILE: "http://72.61.138.82/api"
       run: |
-        npm ci
+        # Added the flag to bypass strict React 19 peer dependency checks
+        npm ci --legacy-peer-deps
         npm run build
 
     - name: Deploy Production Build via Rsync
