@@ -22,7 +22,7 @@ const Login = () => {
     setIsSubmitting(false);
 
     if (success) {
-      navigate('/admin/dashboard');
+      navigate('/dashboard');
     }
   };
 
