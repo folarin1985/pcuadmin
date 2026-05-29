@@ -68,7 +68,7 @@ const Overview = () => {
           <p className="text-gray-500">Welcome to the PCU Content Management System.</p>
         </div>
         <div className="flex gap-3">
-          <Link to="/admin/posts">
+          <Link to="/posts">
             <Button variant="primary" className="text-sm">
               <IoAddCircleOutline className="mr-2 text-lg" />
               New Post
@@ -142,7 +142,7 @@ const Overview = () => {
                       </div>
                     </div>
 
-                    {/*<Link to={`/admin/posts/${post.id}`} className="text-gray-400 hover:text-pcu-purple transition-colors p-2">
+                    {/*<Link to={`/posts/${post.id}`} className="text-gray-400 hover:text-pcu-purple transition-colors p-2">
                       <IoArrowForward />
                     </Link>*/}
                   </div>
@@ -155,7 +155,7 @@ const Overview = () => {
             )}
             
             <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
-              <Link to="/admin/posts" className="text-sm font-medium text-pcu-purple hover:text-pcu-purple-dark transition-colors">
+              <Link to="/posts" className="text-sm font-medium text-pcu-purple hover:text-pcu-purple-dark transition-colors">
                 View All News
               </Link>
             </div>
@@ -171,21 +171,21 @@ const Overview = () => {
           
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
             <QuickActionLink 
-              to="/admin/programs" 
+              to="/programs" 
               label="Add Academic Program" 
               desc="Create a new course"
               icon={IoSchoolOutline}
               color="text-blue-600 bg-blue-50"
             />
             <QuickActionLink 
-              to="/admin/staff" 
+              to="/staff" 
               label="Add Staff Member" 
               desc="Update directory"
               icon={IoAddCircleOutline}
               color="text-emerald-600 bg-emerald-50"
             />
             <QuickActionLink 
-              to="/admin/settings" 
+              to="/settings" 
               label="Site Settings" 
               desc="Update logo or contact"
               icon={IoAddCircleOutline}

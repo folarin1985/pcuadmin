@@ -71,114 +71,114 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   // --- MENU DEFINITIONS ---
   const menuItems = [
     { 
-      path: '/admin/dashboard', 
+      path: '/dashboard', 
       name: 'Overview', 
       icon: IoGridOutline, 
       roles: ['Super Admin', 'Content Editor', 'Event Manager', 'Academic Admin', 'Staff Manager'] 
     },
     { 
-      path: '/admin/bot', 
+      path: '/bot', 
       name: 'Board of Trustees', 
       icon: IoShieldOutline, 
       roles: ['Super Admin'] 
     },
-    { path: '/admin/governing-council', 
+    { path: '/governing-council', 
       name: 'Governing Council', 
       icon: IoShieldCheckmarkOutline, 
       roles: ['Super Admin'] 
     },
     { 
-      path: '/admin/ced-manager', 
+      path: '/ced-manager', 
       name: 'CED Manager', 
       icon: IoShieldCheckmarkOutline, 
       roles: ['Super Admin'] 
     },
     { 
-      path: '/admin/sliders', 
+      path: '/sliders', 
       name: 'Homepage Banners', 
       icon: IoImageOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/widgets', 
+      path: '/widgets', 
       name: 'Homepage Widgets', 
       icon: IoShapesOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/faculties', 
+      path: '/faculties', 
       name: 'Faculties', 
       icon: IoSchoolOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/departments', 
+      path: '/departments', 
       name: 'Departments', 
       icon: IoBusinessOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/programs', 
+      path: '/programs', 
       name: 'Programs', 
       icon: IoSchoolOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/admissions', 
+      path: '/admissions', 
       name: 'Admissions', 
       icon: IoPersonAddOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/academic-calendar', 
+      path: '/academic-calendar', 
       name: 'Academic Calendar', 
       icon: IoCalendarOutline, 
       roles: ['Super Admin', 'Academic Admin', 'Event Manager'] 
     },
     { 
-      path: '/admin/fees', 
+      path: '/fees', 
       name: 'Tuition & Fees', 
       icon: IoWalletOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/scholarships', 
+      path: '/scholarships', 
       name: 'Scholarships', 
       icon: IoSchoolOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     }, 
     { 
-      path: '/admin/staff', 
+      path: '/staff', 
       name: 'Staff', 
       icon: IoPeopleOutline, 
       roles: ['Super Admin', 'Staff Manager'] 
     },
     { 
-      path: '/admin/categories', 
+      path: '/categories', 
       name: 'Categories Manager', 
       icon: IoPricetagsOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/posts', 
+      path: '/posts', 
       name: 'News', 
       icon: IoNewspaperOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/events', 
+      path: '/events', 
       name: 'Events', 
       icon: IoCalendarOutline, 
       roles: ['Super Admin', 'Content Editor', 'Event Manager'] 
     },
     { 
-      path: '/admin/settings', 
+      path: '/settings', 
       name: 'Settings', 
       icon: IoSettingsOutline, 
       roles: ['Super Admin'] 
     },
     { 
-      path: '/admin/users', 
+      path: '/users', 
       name: 'User Management', 
       icon: IoShieldCheckmarkOutline, 
       roles: ['Super Admin'] 

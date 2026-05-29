@@ -34,7 +34,7 @@ const RoleGuard = ({ allowedRoles }) => {
   if (allowedRoles && allowedRoles.length > 0) {
     if (userRole !== 'Super Admin' && !allowedRoles.includes(userRole)) {
       // User is logged in but NOT authorized for this specific route
-      return <Navigate to="/admin/dashboard" replace />;
+      return <Navigate to="/dashboard" replace />;
     }
   }
 
