@@ -9,5 +9,5 @@ export default defineConfig({
     tailwindcss(), // <-- Add this
   ],
 
-  base: '/', 
+  base: '/admin/', 
 })

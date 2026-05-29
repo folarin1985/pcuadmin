@@ -35,7 +35,8 @@ import Scholarships from './pages/dashboard/Scholarships';
 
 const App = () => {
   return (
-    <BrowserRouter>
+    // FIX 1: Added basename to handle subdirectory hosting automatically
+    <BrowserRouter basename="/admin">
       <AuthProvider>
         {/* Toast Notifications */}
         <Toaster 
@@ -44,6 +45,7 @@ const App = () => {
             style: {
               background: '#333',
               color: '#fff',
+              level: 9999,
             },
             success: {
               style: { background: '#5c1885' }, // PCU Purple
@@ -55,15 +57,16 @@ const App = () => {
         />
 
         <Routes>
-          {/* Public Route */}
+          {/* Public Route -> Resolves to /admin/login */}
           <Route path="/login" element={<Login />} />
 
-          {/* Protected Admin Routes Wrapper */}
-          <Route path="/admin" element={<AdminLayout />}>
+          {/* Protected Admin Routes Wrapper -> FIX 2: Changed from "/admin" to "/" to prevent path doubling */}
+          <Route path="/" element={<AdminLayout />}>
             
             {/* 1. PUBLIC DASHBOARD ACCESS (All Logged in Users) */}
             <Route element={<RoleGuard allowedRoles={[]} />}>
-                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                {/* FIX 3: Changed redirect target from "/admin/dashboard" to "/dashboard" */}
+                <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<DashboardOverview />} />
                 <Route path="messages" element={<Messages />} />
             </Route>
@@ -123,7 +126,7 @@ const App = () => {
 
           </Route>
 
-          {/* Catch all */}
+          {/* Catch all -> Resolves to /admin/login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
 
