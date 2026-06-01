@@ -8,18 +8,20 @@ COMPONENTS:
 
 ROUTES DEFINED:
  - /login
- - /admin
+ - /
  - dashboard
  - messages
  - users
  - settings
  - bot
+ - governing-council
  - menus
  - posts
  - pages
  - sliders
  - widgets
  - categories
+ - ced-manager
  - events
  - academic-calendar
  - faculties
@@ -59,6 +61,8 @@ IMPORTS:
  - import AcademicCalendar from './pages/dashboard/AcademicCalendar'
  - import TuitionManagement from './pages/dashboard/TuitionManagement'
  - import Trustees from './pages/dashboard/Trustees'
+ - import GoverningCouncil from './pages/dashboard/GoverningCouncil'
+ - import CedManager from './pages/dashboard/CedManager'
  - import JupebManager from './pages/dashboard/JupebManager'
  - import Scholarships from './pages/dashboard/Scholarships'
 
@@ -94,12 +98,15 @@ import Admissions from './pages/dashboard/Admissions';
 import AcademicCalendar from './pages/dashboard/AcademicCalendar';
 import TuitionManagement from './pages/dashboard/TuitionManagement';
 import Trustees from './pages/dashboard/Trustees';
+import GoverningCouncil from './pages/dashboard/GoverningCouncil';
+import CedManager from './pages/dashboard/CedManager';
 import JupebManager from './pages/dashboard/JupebManager';
 import Scholarships from './pages/dashboard/Scholarships';
 
 const App = () => {
   return (
-    <BrowserRouter>
+    // FIX 1: Added basename to handle subdirectory hosting automatically
+    <BrowserRouter basename="/admin">
       <AuthProvider>
         {/* Toast Notifications */}
         <Toaster 
@@ -108,6 +115,7 @@ const App = () => {
             style: {
               background: '#333',
               color: '#fff',
+              level: 9999,
             },
             success: {
               style: { background: '#5c1885' }, // PCU Purple
@@ -119,15 +127,16 @@ const App = () => {
         />
 
         <Routes>
-          {/* Public Route */}
+          {/* Public Route -> Resolves to /admin/login */}
           <Route path="/login" element={<Login />} />
 
-          {/* Protected Admin Routes Wrapper */}
-          <Route path="/admin" element={<AdminLayout />}>
+          {/* Protected Admin Routes Wrapper -> FIX 2: Changed from "/admin" to "/" to prevent path doubling */}
+          <Route path="/" element={<AdminLayout />}>
             
             {/* 1. PUBLIC DASHBOARD ACCESS (All Logged in Users) */}
             <Route element={<RoleGuard allowedRoles={[]} />}>
-                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                {/* FIX 3: Changed redirect target from "/admin/dashboard" to "/dashboard" */}
+                <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<DashboardOverview />} />
                 <Route path="messages" element={<Messages />} />
             </Route>
@@ -137,6 +146,7 @@ const App = () => {
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="bot" element={<Trustees />} />
+                <Route path="governing-council" element={<GoverningCouncil />} />
                 <Route path="menus" element={<Menus />} />
             </Route>
 
@@ -147,6 +157,7 @@ const App = () => {
                 <Route path="sliders" element={<Sliders />} />
                 <Route path="widgets" element={<HomepageWidgets />} />
                 <Route path="categories" element={<CategoryPage />} />
+                <Route path="ced-manager" element={<CedManager />} />
             </Route>
 
             {/* 4. EVENT MANAGEMENT (Super Admin, Editor, Event Manager) */}
@@ -185,7 +196,7 @@ const App = () => {
 
           </Route>
 
-          {/* Catch all */}
+          {/* Catch all -> Resolves to /admin/login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
 
@@ -442,7 +453,7 @@ const RoleGuard = ({ allowedRoles }) => {
   if (allowedRoles && allowedRoles.length > 0) {
     if (userRole !== 'Super Admin' && !allowedRoles.includes(userRole)) {
       // User is logged in but NOT authorized for this specific route
-      return <Navigate to="/admin/dashboard" replace />;
+      return <Navigate to="/dashboard" replace />;
     }
   }
 
@@ -866,103 +877,114 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   // --- MENU DEFINITIONS ---
   const menuItems = [
     { 
-      path: '/admin/dashboard', 
+      path: '/dashboard', 
       name: 'Overview', 
       icon: IoGridOutline, 
       roles: ['Super Admin', 'Content Editor', 'Event Manager', 'Academic Admin', 'Staff Manager'] 
     },
     { 
-      path: '/admin/bot', 
+      path: '/bot', 
       name: 'Board of Trustees', 
       icon: IoShieldOutline, 
       roles: ['Super Admin'] 
     },
+    { path: '/governing-council', 
+      name: 'Governing Council', 
+      icon: IoShieldCheckmarkOutline, 
+      roles: ['Super Admin'] 
+    },
     { 
-      path: '/admin/sliders', 
+      path: '/ced-manager', 
+      name: 'CED Manager', 
+      icon: IoShieldCheckmarkOutline, 
+      roles: ['Super Admin'] 
+    },
+    { 
+      path: '/sliders', 
       name: 'Homepage Banners', 
       icon: IoImageOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/widgets', 
+      path: '/widgets', 
       name: 'Homepage Widgets', 
       icon: IoShapesOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/faculties', 
+      path: '/faculties', 
       name: 'Faculties', 
       icon: IoSchoolOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/departments', 
+      path: '/departments', 
       name: 'Departments', 
       icon: IoBusinessOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/programs', 
+      path: '/programs', 
       name: 'Programs', 
       icon: IoSchoolOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/admissions', 
+      path: '/admissions', 
       name: 'Admissions', 
       icon: IoPersonAddOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/academic-calendar', 
+      path: '/academic-calendar', 
       name: 'Academic Calendar', 
       icon: IoCalendarOutline, 
       roles: ['Super Admin', 'Academic Admin', 'Event Manager'] 
     },
     { 
-      path: '/admin/fees', 
+      path: '/fees', 
       name: 'Tuition & Fees', 
       icon: IoWalletOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     },
     { 
-      path: '/admin/scholarships', 
+      path: '/scholarships', 
       name: 'Scholarships', 
       icon: IoSchoolOutline, 
       roles: ['Super Admin', 'Academic Admin'] 
     }, 
     { 
-      path: '/admin/staff', 
+      path: '/staff', 
       name: 'Staff', 
       icon: IoPeopleOutline, 
       roles: ['Super Admin', 'Staff Manager'] 
     },
     { 
-      path: '/admin/categories', 
+      path: '/categories', 
       name: 'Categories Manager', 
       icon: IoPricetagsOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/posts', 
+      path: '/posts', 
       name: 'News', 
       icon: IoNewspaperOutline, 
       roles: ['Super Admin', 'Content Editor'] 
     },
     { 
-      path: '/admin/events', 
+      path: '/events', 
       name: 'Events', 
       icon: IoCalendarOutline, 
       roles: ['Super Admin', 'Content Editor', 'Event Manager'] 
     },
     { 
-      path: '/admin/settings', 
+      path: '/settings', 
       name: 'Settings', 
       icon: IoSettingsOutline, 
       roles: ['Super Admin'] 
     },
     { 
-      path: '/admin/users', 
+      path: '/users', 
       name: 'User Management', 
       icon: IoShieldCheckmarkOutline, 
       roles: ['Super Admin'] 
@@ -1172,8 +1194,12 @@ export const AuthProvider = ({ children }) => {
     if (path.startsWith('http')) return path; 
     if (path.startsWith('data:')) return path; 
     
-    const baseUrl = axios.defaults.baseURL.replace('/api', '');
-    return `${baseUrl}${path}`;
+    // Clean base URL and path to ensure exact formatting: http://domain.com/storage/path.jpg
+    const baseUrl = (axios.defaults.baseURL || '').replace(/\/api\/?$/, '');
+    let cleanPath = path.replace(/^public\//, '').replace(/^storage\//, '').replace(/^\/storage\//, '');
+    if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
+    
+    return `${baseUrl}/storage${cleanPath}`;
   };
 
   return (
@@ -1258,7 +1284,7 @@ const Login = () => {
     setIsSubmitting(false);
 
     if (success) {
-      navigate('/admin/dashboard');
+      navigate('/dashboard');
     }
   };
 
@@ -2495,6 +2521,114 @@ const CategoryPage = () => {
 export default CategoryPage;
 
 ========================================
+FILE: pages\dashboard\CedManager.jsx
+========================================
+
+COMPONENTS:
+ - CedManager
+
+HOOKS USED:
+ - useState
+ - useEffect
+ - useAuth
+
+API CALLS:
+ - /admin/ced-galleries
+ - /admin/ced-galleries/${id}
+
+IMPORTS:
+ - import React, { useState, useEffect } from 'react'
+ - import axios from 'axios'
+ - import { toast } from 'react-hot-toast'
+ - import { IoCloudUploadOutline, IoTrash, IoImageOutline } from 'react-icons/io5'
+ - import { useAuth } from '../../contexts/AuthContext'
+ - import Button from '../../components/common/Button'
+ - import Spinner from '../../components/common/Spinner'
+
+CONTENT:
+
+// pages/dashboard/CedManager.jsx
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { IoCloudUploadOutline, IoTrash, IoImageOutline } from 'react-icons/io5';
+import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/common/Button';
+import Spinner from '../../components/common/Spinner';
+
+// Manages CED pictures of engagements
+const CedManager = () => {
+  const { getImageUrl } = useAuth();
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const fetchGallery = async () => {
+    try {
+      const res = await axios.get('/admin/ced-galleries');
+      setImages(res.data.data);
+    } catch (e) { toast.error("Failed to fetch gallery"); } 
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchGallery(); }, []);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+        try {
+            await axios.post('/admin/ced-galleries', { image_path: reader.result, caption: 'CED Engagement' });
+            toast.success('Image uploaded');
+            fetchGallery();
+        } catch (err) { toast.error('Upload failed'); }
+        finally { setIsUploading(false); }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDelete = async (id) => {
+      if (!window.confirm("Delete this image?")) return;
+      try {
+          await axios.delete(`/admin/ced-galleries/${id}`);
+          toast.success('Image deleted');
+          fetchGallery();
+      } catch (err) { toast.error('Delete failed'); }
+  };
+
+  if (loading) return <div className="flex justify-center p-20"><Spinner size="lg" color="purple"/></div>;
+
+  return (
+    <div className="space-y-6">
+      <div><h1 className="text-2xl font-bold text-gray-800">CED Engagement Gallery</h1><p className="text-gray-500 text-sm">Upload pictures of students and facilitators engaged in CED activities.</p></div>
+      
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+         <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+            {isUploading ? <Spinner size="md" color="purple" /> : <><IoCloudUploadOutline className="text-3xl text-gray-400 mb-2"/><span className="text-sm font-bold text-gray-500">Click to Upload New Image</span></>}
+            <input type="file" className="hidden" accept="image/*" onChange={handleUpload} disabled={isUploading} />
+         </label>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+         {images.map(img => (
+             <div key={img.id} className="relative group rounded-xl overflow-hidden shadow-sm h-48 border border-gray-200">
+                 <img src={getImageUrl(img.image_path)} className="w-full h-full object-cover" alt="CED" />
+                 <button onClick={() => handleDelete(img.id)} className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 shadow-md">
+                     <IoTrash size={16}/>
+                 </button>
+             </div>
+         ))}
+         {images.length === 0 && <div className="col-span-full text-center py-10 text-gray-400"><IoImageOutline size={40} className="mx-auto mb-2 opacity-50"/> No images uploaded yet.</div>}
+      </div>
+    </div>
+  );
+};
+export default CedManager;
+
+========================================
 FILE: pages\dashboard\Departments.jsx
 ========================================
 
@@ -3671,7 +3805,8 @@ const Faculties = () => {
     color_code: '#5c1885', // Default PCU Purple
     image_path: '', // Thumbnail
     banner_image: '', // Hero Banner
-    banner_caption: '' 
+    banner_caption: '',
+    dean_name: ''
   };
   const [formData, setFormData] = useState(initialForm);
 
@@ -3719,7 +3854,8 @@ const Faculties = () => {
       color_code: faculty.color_code || '#5c1885',
       image_path: faculty.image_path || '',
       banner_image: faculty.banner_image || '',
-      banner_caption: faculty.banner_caption || ''
+      banner_caption: faculty.banner_caption || '',
+      dean_name: faculty.dean_name || ''
     });
     setIsFormOpen(true);
   };
@@ -3800,6 +3936,14 @@ const Faculties = () => {
         </span>
       )
     },
+
+    {
+      name: 'Dean',
+      selector: row => row.dean_name,
+      sortable: true,
+      cell: row => <span className="text-sm text-gray-600 font-medium">{row.dean_name || 'Not Assigned'}</span>
+    },
+    
     {
       name: 'Actions',
       cell: row => (
@@ -3836,6 +3980,11 @@ const Faculties = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Faculty Name</label>
                 <input type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dean's Name</label>
+                <input type="text" className="input-field" placeholder="e.g. Prof. John Doe" value={formData.dean_name} onChange={e => setFormData({...formData, dean_name: e.target.value})} />
               </div>
               
               <div>
@@ -3912,6 +4061,200 @@ const Faculties = () => {
 };
 
 export default Faculties;
+
+========================================
+FILE: pages\dashboard\GoverningCouncil.jsx
+========================================
+
+COMPONENTS:
+ - GoverningCouncil
+
+HOOKS USED:
+ - useState
+ - useEffect
+ - useMemo
+ - useAuth
+
+API CALLS:
+ - /admin/governing-councils
+ - /admin/governing-councils/${selectedCouncil.id}
+ - /admin/governing-councils/${deleteId}
+
+IMPORTS:
+ - import React, { useState, useEffect, useMemo } from 'react'
+ - import axios from 'axios'
+ - import DataTable from 'react-data-table-component'
+ - import { toast } from 'react-hot-toast'
+ - import { IoAdd, IoPencil, IoTrash, IoPersonOutline, IoImageOutline } from 'react-icons/io5'
+ - import { useAuth } from '../../contexts/AuthContext'
+ - import Button from '../../components/common/Button'
+ - import Modal from '../../components/common/Modal'
+ - import ConfirmModal from '../../components/common/ConfirmModal'
+ - import { glossyTableStyles } from '../../styles/tableStyles'
+
+CONTENT:
+
+// pages/dashboard/GoverningCouncil.jsx
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
+import DataTable from 'react-data-table-component';
+import { toast } from 'react-hot-toast';
+import { IoAdd, IoPencil, IoTrash, IoPersonOutline, IoImageOutline } from 'react-icons/io5';
+import { useAuth } from '../../contexts/AuthContext';
+
+import Button from '../../components/common/Button';
+import Modal from '../../components/common/Modal';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import { glossyTableStyles } from '../../styles/tableStyles';
+
+// Manages the Governing Council data similarly to Board of Trustees
+const GoverningCouncil = () => {
+  const { getImageUrl } = useAuth();
+  const [councils, setCouncils] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [selectedCouncil, setSelectedCouncil] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+
+  const initialForm = { name: '', position: 'Member', bio: '', image: '', order_weight: 0, is_active: true };
+  const [formData, setFormData] = useState(initialForm);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get('/admin/governing-councils');
+      setCouncils(res.data.data);
+    } catch (error) { toast.error('Failed to load Governing Council'); } 
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setFormData(prev => ({ ...prev, image: reader.result }));
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const openCreateModal = () => {
+    setSelectedCouncil(null);
+    setFormData(initialForm);
+    setIsFormOpen(true);
+  };
+
+  const openEditModal = (council) => {
+    setSelectedCouncil(council);
+    setFormData({ 
+      name: council.name, position: council.position, bio: council.bio || '',
+      image: council.image || '', order_weight: council.order_weight || 0, is_active: Boolean(council.is_active)
+    });
+    setIsFormOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (selectedCouncil) {
+        await axios.put(`/admin/governing-councils/${selectedCouncil.id}`, formData);
+        toast.success('Council Member updated');
+      } else {
+        await axios.post('/admin/governing-councils', formData);
+        toast.success('Member added to council');
+      }
+      setIsFormOpen(false);
+      fetchData();
+    } catch (error) { toast.error('Operation failed'); } 
+    finally { setIsSubmitting(false); }
+  };
+
+  const handleDelete = async () => {
+    setIsSubmitting(true);
+    try {
+      await axios.delete(`/admin/governing-councils/${deleteId}`);
+      toast.success('Member removed');
+      setIsDeleteOpen(false);
+      fetchData();
+    } catch (error) { toast.error('Failed to delete member'); } 
+    finally { setIsSubmitting(false); }
+  };
+
+  const filteredItems = useMemo(() => councils.filter(c => c.name.toLowerCase().includes(search.toLowerCase())), [councils, search]);
+
+  const columns = [
+    {
+      name: 'Member', grow: 2,
+      cell: row => (
+        <div className="flex items-center gap-3 py-2">
+          <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 bg-gray-100 flex-shrink-0">
+             {row.image ? <img src={getImageUrl(row.image)} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex items-center justify-center text-gray-400"><IoPersonOutline /></div>}
+          </div>
+          <div><span className="font-semibold text-gray-700 block">{row.name}</span><span className="text-xs text-pcu-purple font-medium uppercase tracking-wider">{row.position}</span></div>
+        </div>
+      ),
+    },
+    { name: 'Weight', width: '100px', selector: row => row.order_weight, sortable: true, cell: row => <span className="font-mono text-xs text-gray-400">#{row.order_weight}</span> },
+    { name: 'Status', width: '100px', cell: row => <span className={`text-xs px-2 py-1 rounded-full ${row.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{row.is_active ? 'Active' : 'Hidden'}</span> },
+    { name: 'Actions', cell: row => (
+        <div className="flex gap-2">
+          <button onClick={() => openEditModal(row)} className="p-2 text-gray-500 hover:text-pcu-purple hover:bg-purple-50 rounded-lg transition-colors"><IoPencil size={18} /></button>
+          <button onClick={() => { setDeleteId(row.id); setIsDeleteOpen(true); }} className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><IoTrash size={18} /></button>
+        </div>
+      ), ignoreRowClick: true, button: true,
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div><h1 className="text-2xl font-bold text-gray-800">Governing Council</h1><p className="text-gray-500 text-sm">Manage the university's governing council members.</p></div>
+        <Button onClick={openCreateModal}><IoAdd className="mr-2 text-xl" /> Add Member</Button>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-end">
+           <input type="text" placeholder="Search by name..." className="input-field max-w-xs py-2" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </div>
+        <DataTable columns={columns} data={filteredItems} pagination progressPending={loading} customStyles={glossyTableStyles} highlightOnHover />
+      </div>
+
+      <Modal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} title={selectedCouncil ? "Edit Member" : "New Member"} size="lg">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label><input type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">Position</label><input type="text" className="input-field" placeholder="e.g. Chairman" value={formData.position} onChange={e => setFormData({...formData, position: e.target.value})} required /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Order Weight</label><input type="number" className="input-field" value={formData.order_weight} onChange={e => setFormData({...formData, order_weight: e.target.value})} /></div>
+                <div className="flex items-end mb-2"><label className="flex items-center gap-2 cursor-pointer bg-gray-50 px-4 py-2.5 rounded-xl border border-gray-200 w-full shadow-sm"><input type="checkbox" className="accent-pcu-purple w-4 h-4" checked={formData.is_active} onChange={e => setFormData({...formData, is_active: e.target.checked})} /><span className="text-sm font-medium text-gray-700">Active?</span></label></div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Member Photo</label>
+              <div className="relative w-full h-44 bg-gray-200 rounded-2xl overflow-hidden border-2 border-dashed border-gray-300 group">
+                 {formData.image ? <img src={getImageUrl(formData.image)} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex flex-col items-center justify-center text-gray-400"><IoImageOutline size={40} /><span className="text-xs mt-2 font-medium uppercase tracking-wider">Click to upload</span></div>}
+                 <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer text-white font-bold">Change Image<input type="file" className="hidden" accept="image/*" onChange={handleFileChange} /></label>
+              </div>
+            </div>
+          </div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Biography</label><textarea className="input-field min-h-[150px]" placeholder="Profile..." value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} /></div>
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100"><Button variant="secondary" onClick={() => setIsFormOpen(false)}>Cancel</Button><Button type="submit" isLoading={isSubmitting}>Save Member</Button></div>
+        </form>
+      </Modal>
+
+      <ConfirmModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDelete} title="Remove Member?" message="This will permanently delete this member." isLoading={isSubmitting} />
+    </div>
+  );
+};
+export default GoverningCouncil;
 
 ========================================
 FILE: pages\dashboard\HomepageWidgets.jsx
@@ -5338,7 +5681,7 @@ const Overview = () => {
           <p className="text-gray-500">Welcome to the PCU Content Management System.</p>
         </div>
         <div className="flex gap-3">
-          <Link to="/admin/posts">
+          <Link to="/posts">
             <Button variant="primary" className="text-sm">
               <IoAddCircleOutline className="mr-2 text-lg" />
               New Post
@@ -5412,7 +5755,7 @@ const Overview = () => {
                       </div>
                     </div>
 
-                    {/*<Link to={`/admin/posts/${post.id}`} className="text-gray-400 hover:text-pcu-purple transition-colors p-2">
+                    {/*<Link to={`/posts/${post.id}`} className="text-gray-400 hover:text-pcu-purple transition-colors p-2">
                       <IoArrowForward />
                     </Link>*/}
                   </div>
@@ -5425,7 +5768,7 @@ const Overview = () => {
             )}
             
             <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
-              <Link to="/admin/posts" className="text-sm font-medium text-pcu-purple hover:text-pcu-purple-dark transition-colors">
+              <Link to="/posts" className="text-sm font-medium text-pcu-purple hover:text-pcu-purple-dark transition-colors">
                 View All News
               </Link>
             </div>
@@ -5441,21 +5784,21 @@ const Overview = () => {
           
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
             <QuickActionLink 
-              to="/admin/programs" 
+              to="/programs" 
               label="Add Academic Program" 
               desc="Create a new course"
               icon={IoSchoolOutline}
               color="text-blue-600 bg-blue-50"
             />
             <QuickActionLink 
-              to="/admin/staff" 
+              to="/staff" 
               label="Add Staff Member" 
               desc="Update directory"
               icon={IoAddCircleOutline}
               color="text-emerald-600 bg-emerald-50"
             />
             <QuickActionLink 
-              to="/admin/settings" 
+              to="/settings" 
               label="Site Settings" 
               desc="Update logo or contact"
               icon={IoAddCircleOutline}
@@ -6542,6 +6885,8 @@ const Programs = () => {
   
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  const [studyMode, setStudyMode] = useState('All');
   
   // Modals
   const [isProgramModalOpen, setIsProgramModalOpen] = useState(false);
@@ -6562,8 +6907,12 @@ const Programs = () => {
     overview: '', requirements: '', 
     faculty_id: '', department_id: '',
     banner_image: '', banner_caption: '',
-    is_featured: false
+    is_featured: false,
+    is_full_time: true,  // Default to true
+    is_part_time: false  // Default to false
   };
+
+
   const [programForm, setProgramForm] = useState(initialProgramForm);
   const [degreeForm, setDegreeForm] = useState({ name: '', abbr: '', program_category_id: '' });
   const [categoryForm, setCategoryForm] = useState({ name: '' });
@@ -6649,7 +6998,9 @@ const Programs = () => {
       faculty_id: facultyId,
       banner_image: program.banner_image || '',
       banner_caption: program.banner_caption || '',
-      is_featured: Boolean(program.is_featured)
+      is_featured: Boolean(program.is_featured),
+      is_full_time: program.is_full_time !== undefined ? Boolean(program.is_full_time) : true,
+      is_part_time: Boolean(program.is_part_time)
     });
     setIsProgramModalOpen(true);
   };
@@ -6763,12 +7114,18 @@ const Programs = () => {
 
   const filteredPrograms = useMemo(() => {
       const s = search.toLowerCase();
-      return programs.filter(p => 
-          p.title.toLowerCase().includes(s) || 
-          p.degree_type?.category?.name?.toLowerCase().includes(s) || 
-          p.department?.name?.toLowerCase().includes(s)
-      );
-  }, [programs, search]);
+      return programs.filter(p => {
+          const matchesSearch = p.title.toLowerCase().includes(s) || 
+                                p.degree_type?.category?.name?.toLowerCase().includes(s) || 
+                                p.department?.name?.toLowerCase().includes(s);
+          
+          // Filter by Study Mode
+          const matchesMode = studyMode === 'All' ? true : 
+                              (studyMode === 'Full-Time' ? p.is_full_time : p.is_part_time);
+                              
+          return matchesSearch && matchesMode;
+      });
+  }, [programs, search, studyMode]);
 
   const filteredDegrees = useMemo(() => degreeTypes.filter(d => d.name.toLowerCase().includes(search.toLowerCase())), [degreeTypes, search]);
   const filteredCategories = useMemo(() => categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase())), [categories, search]);
@@ -6790,6 +7147,10 @@ const Programs = () => {
             </span>
             <span className="text-xs text-gray-400">•</span>
             <span className="text-xs font-bold text-gray-500">{row.degree_type?.abbr || 'N/A'}</span>
+
+            {/* Visual Tags for Study Modes */}
+            {row.is_full_time && <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded ml-2">Full-Time</span>}
+            {row.is_part_time && <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded ml-1">Part-Time</span>}
         </div>
       </div>
     ),
@@ -6883,12 +7244,22 @@ const Programs = () => {
             </button>
         </div>
 
-        <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-end">
+        <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row justify-end gap-3">
+          {activeTab === 'programs' && (
+              <select 
+                  className="input-field py-2 w-full md:w-48 bg-white text-sm" 
+                  value={studyMode} 
+                  onChange={e => setStudyMode(e.target.value)}
+              >
+                  <option value="All">All Study Modes</option>
+                  <option value="Full-Time">Full-Time Only</option>
+                  <option value="Part-Time">Part-Time Only</option>
+              </select>
+          )}
           <div className="w-full md:w-64">
-            <input type="text" placeholder={`Search ${activeTab}...`} className="input-field py-2" value={search} onChange={handleSearch} />
+            <input type="text" placeholder={`Search ${activeTab}...`} className="input-field py-2 text-sm" value={search} onChange={handleSearch} />
           </div>
         </div>
-
         <DataTable 
             columns={activeTab === 'programs' ? programColumns : (activeTab === 'degrees' ? degreeColumns : categoryColumns)} 
             data={activeTab === 'programs' ? filteredPrograms : (activeTab === 'degrees' ? filteredDegrees : filteredCategories)} 
@@ -6985,6 +7356,37 @@ const Programs = () => {
                  >
                    {programForm.is_featured ? <IoStar /> : <IoStarOutline />}
                    {programForm.is_featured ? 'Featured on Homepage' : 'Standard Course'}
+                 </button>
+
+                 {/* New Part-Time Toggle */}
+                 <button 
+                   type="button"
+                   onClick={() => setProgramForm(prev => ({...prev, is_part_time: !prev.is_part_time}))}
+                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
+                     programForm.is_part_time ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-600'
+                   }`}
+                 >
+                   {/* Explicit Checkboxes for Study Modes allowing both to be checked */}
+                 <div className="flex gap-4">
+                    <label className="flex flex-1 items-center gap-2 cursor-pointer bg-gray-50 px-4 py-2.5 rounded-lg border border-gray-200 hover:border-green-300 transition-colors">
+                        <input 
+                            type="checkbox" 
+                            className="accent-green-600 w-4 h-4" 
+                            checked={programForm.is_full_time} 
+                            onChange={e => setProgramForm({...programForm, is_full_time: e.target.checked})} 
+                        />
+                        <span className="text-sm font-medium text-gray-700">Full-Time</span>
+                    </label>
+                    <label className="flex flex-1 items-center gap-2 cursor-pointer bg-gray-50 px-4 py-2.5 rounded-lg border border-gray-200 hover:border-purple-300 transition-colors">
+                        <input 
+                            type="checkbox" 
+                            className="accent-purple-600 w-4 h-4" 
+                            checked={programForm.is_part_time} 
+                            onChange={e => setProgramForm({...programForm, is_part_time: e.target.checked})} 
+                        />
+                        <span className="text-sm font-medium text-gray-700">Part-Time</span>
+                    </label>
+                 </div>
                  </button>
               </div>
             </div>
@@ -7467,7 +7869,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { 
-  IoSaveOutline, IoImagesOutline, IoCallOutline, IoShareSocialOutline, IoMegaphoneOutline, IoCloudUploadOutline
+  IoSaveOutline, IoImagesOutline, IoCallOutline, IoShareSocialOutline, IoMegaphoneOutline, 
+  IoCloudUploadOutline, IoPeopleOutline,
 } from 'react-icons/io5';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -7558,6 +7961,8 @@ const Settings = () => {
       await axios.post('/settings', settings);
       toast.success('Site settings updated');
     } catch (error) {
+      // THIS WILL PRINT THE EXACT SERVER ERROR TO YOUR BROWSER CONSOLE
+      console.error("FULL ERROR RESPONSE:", error.response?.data || error.message);
       toast.error('Failed to save settings');
     } finally {
       setIsSubmitting(false);
@@ -7575,6 +7980,8 @@ const Settings = () => {
         }
         toast.success('Alert banner updated');
     } catch (error) {
+        // THIS WILL PRINT THE EXACT SERVER ERROR TO YOUR BROWSER CONSOLE
+        console.error("FULL ERROR RESPONSE:", error.response?.data || error.message);
         toast.error('Failed to update alert');
     } finally {
         setIsSubmitting(false);
@@ -7595,6 +8002,7 @@ const Settings = () => {
                 { id: 'general', label: 'Branding & SEO', icon: IoImagesOutline },
                 { id: 'contact', label: 'Contact Info', icon: IoCallOutline },
                 { id: 'social', label: 'Social Media', icon: IoShareSocialOutline },
+                { id: 'leadership', label: 'Chaplain & CED', icon: IoPeopleOutline },
                 //{ id: 'alert', label: 'Top Bar Alert', icon: IoMegaphoneOutline },
             ].map(tab => (
                 <button
@@ -7723,6 +8131,53 @@ const Settings = () => {
                         <input type="text" name="social_linkedin" className="input-field" value={settings.social_linkedin} onChange={handleSettingChange} />
                     </div>
                     <Button onClick={saveSettings} isLoading={isSubmitting}><IoSaveOutline className="mr-2"/> Save Social Links</Button>
+                </div>
+            )}
+
+            {/* --- TAB 4: LEADERSHIP (Chaplain & CED) --- */}
+            {activeTab === 'leadership' && (
+                <div className="space-y-8 max-w-4xl">
+                    {/* Chaplain Details */}
+                    <div className="bg-purple-50 p-6 rounded-2xl border border-purple-100">
+                        <h3 className="text-lg font-bold text-pcu-purple mb-4">University Chaplaincy</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Chaplain Name</label>
+                                <input type="text" name="chaplain_name" className="input-field bg-white" placeholder="e.g. Pastor John Doe" value={settings.chaplain_name || ''} onChange={handleSettingChange} />
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-white overflow-hidden border-2 border-white shadow-sm shrink-0">
+                                    {settings.chaplain_image ? <img src={getImageUrl(settings.chaplain_image)} className="w-full h-full object-cover"/> : <span className="flex h-full items-center justify-center text-xs text-gray-400">Photo</span>}
+                                </div>
+                                <label className="cursor-pointer text-sm font-bold text-pcu-purple hover:underline bg-white px-3 py-1.5 rounded-lg border border-purple-200">
+                                    Upload Photo
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'chaplain_image')} />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CED Director Details */}
+                    <div className="bg-yellow-50 p-6 rounded-2xl border border-yellow-100">
+                        <h3 className="text-lg font-bold text-yellow-800 mb-4">Centre for Entrepreneurship (CED)</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Director Name</label>
+                                <input type="text" name="ced_director_name" className="input-field bg-white" placeholder="e.g. Dr. Jane Smith" value={settings.ced_director_name || ''} onChange={handleSettingChange} />
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-white overflow-hidden border-2 border-white shadow-sm shrink-0">
+                                    {settings.ced_director_image ? <img src={getImageUrl(settings.ced_director_image)} className="w-full h-full object-cover"/> : <span className="flex h-full items-center justify-center text-xs text-gray-400">Photo</span>}
+                                </div>
+                                <label className="cursor-pointer text-sm font-bold text-yellow-700 hover:underline bg-white px-3 py-1.5 rounded-lg border border-yellow-200">
+                                    Upload Photo
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'ced_director_image')} />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button onClick={saveSettings} isLoading={isSubmitting}><IoSaveOutline className="mr-2"/> Save Details</Button>
                 </div>
             )}
 
