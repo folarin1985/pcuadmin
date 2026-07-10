@@ -19,6 +19,7 @@ import {
   IoPersonAddOutline,
   IoWalletOutline,
   IoShieldOutline,
+  IoLink,
 } from 'react-icons/io5';
 import Logo from '../../assets/images/pculogo.png';
 import { useAuth } from '../../contexts/AuthContext';
@@ -75,6 +76,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       name: 'Overview', 
       icon: IoGridOutline, 
       roles: ['Super Admin', 'Content Editor', 'Event Manager', 'Academic Admin', 'Staff Manager'] 
+    },
+    { 
+      path: '/portal-links', 
+      name: 'Portal Links', 
+      icon: IoLink, 
+      roles: ['Super Admin', 'Content Editor', 'Admin'] 
     },
     { 
       path: '/bot', 

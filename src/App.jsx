@@ -32,6 +32,7 @@ import GoverningCouncil from './pages/dashboard/GoverningCouncil';
 import CedManager from './pages/dashboard/CedManager';
 import JupebManager from './pages/dashboard/JupebManager';
 import Scholarships from './pages/dashboard/Scholarships';
+import PortalLinks from './pages/dashboard/PortalLinks';
 
 const App = () => {
   return (
@@ -123,6 +124,12 @@ const App = () => {
             <Route element={<RoleGuard allowedRoles={['Super Admin', 'Staff Manager', 'Human Resources', 'Admin']} />}>
                 <Route path="staff" element={<Staff />} />
             </Route>
+
+            {/* 10. PORTAL LINKS (Super Admin, Content Editor, Admin) */}
+            <Route element={<RoleGuard allowedRoles={['Super Admin', 'Content Editor', 'Admin']} />}>
+                <Route path="portal-links" element={<PortalLinks />} />
+            </Route>
+            
 
           </Route>
 
